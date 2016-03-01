@@ -1,8 +1,5 @@
 *.py[cod]
 
-# custom
-log/
-
 # C extensions
 *.so
 
