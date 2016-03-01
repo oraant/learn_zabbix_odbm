@@ -4,15 +4,14 @@ import socket
 import os,sys
 import ConfigParser
 
-if __name__ == '__main__':
-    '''通过Socket与Server通信并获取数据
-    '''
-    #根据参数获取要发送的内容
+def __parse_args():
+    '''根据参数获取要发送的内容'''
     try:
         if sys.argv[1] == 'stop':
             req = 'stop'
         else:
             req = sys.argv[1] +';'+ sys.argv[2] +';'+ sys.argv[3]
+        return req
     except IndexError:
         print ''
         print '  Did not found any parameter.Syntax should be:'
@@ -27,19 +26,28 @@ if __name__ == '__main__':
         print e
         exit(2)
 
-    #获取配置文件以及socket文件的配置
-    config = ConfigParser.ConfigParser()
+def __get_config():
+    '''#获取配置文件以及socket文件的配置'''
     path = sys.path[0]
+    config = ConfigParser.ConfigParser()
     config.read(path + "/conf/zodbm.conf")
+
     c_sock_file = config.get("base","sock_file")
     sock_file = c_sock_file if c_sock_file != '' else path + "/lib/zodbm.sock"    
+    return sock_file
 
-    #通过socket文件连接到Server上并发送请求
+
+if __name__ == '__main__':
+
+    req = __parse_args()
+    sock_file = __get_config()
     client = socket.socket(socket.AF_UNIX, socket.SOCK_STREAM)
+
     try:
         client.connect(sock_file)
         client.send(req)
         print client.recv(1024)
     except socket.error:
         print 'Server is not running.'
-    client.close()
+    finally:
+        client.close()
