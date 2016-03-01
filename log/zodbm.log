@@ -1,0 +1,12 @@
+Traceback (most recent call last):
+  File "zodbm.py", line 106, in <module>
+    start_server(config["sock_file"])
+  File "zodbm.py", line 60, in start_server
+    connection.send(res)
+socket.error: [Errno 32] Broken pipe
+Traceback (most recent call last):
+  File "zodbm.py", line 106, in <module>
+    start_server(config["sock_file"])
+  File "zodbm.py", line 60, in start_server
+    connection.send(res)
+socket.error: [Errno 32] Broken pipe

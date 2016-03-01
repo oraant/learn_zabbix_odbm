@@ -60,18 +60,23 @@ def start_server(sock='/tmp/zodbm.sock'):
             connection.send(res)
     connection.send('ZODBM Server Has Stoped')
     connection.close()
+    os.unlink(sock)
     exit(0)
 
 def get_config():
+    '''从配置文件中获取配置
+    '''
     import ConfigParser
     config = ConfigParser.ConfigParser()
     path = sys.path[0]
     config.read(path + "/conf/zodbm.conf")
 
+    #读取配置
     c_log_file  = config.get("base","log_file")
     c_log_level = config.get("base","log_level")
     c_sock_file = config.get("base","sock_file")
 
+    #配置为空时的处理方式
     log_file  = c_log_file  if c_log_file  != '' else path + "/log/zodbm.log"
     log_level = c_log_level if c_log_level != '' else 3
     sock_file = c_sock_file if c_sock_file != '' else path + "/lib/zodbm.sock"
@@ -80,23 +85,23 @@ def get_config():
     return configs
 
 def verify_passwd():
+    '''
+    '''
     import lib.verify as v
     verify = v.Verify()
 
     print '\n  The encrypted text is:'
-    print '  '+verify.generate_code()
-    passwd = raw_input('  please input password for zodbm:')
+    print '  \033[1;31;31m' + verify.generate_code() + '\033[0m'
+    passwd = raw_input('  Please input password for zodbm:')
     return verify.verify_passwd(passwd)
     #433245946875903
 
 if __name__ == '__main__':
     if verify_passwd():
-        print '  verify \033[4mpassed\033[0m,starting zodbm daemon process.\n'
+        print '  Verify \033[4mpassed\033[0m,starting zodbm daemon process.\n'
     else:
-        print '  verify \033[4mfailed\033[0m,please contact developers in ChinaITSoft.\n'
+        print '  Verify \033[4mfailed\033[0m,please contact developers in \033[4mChinaITSoft\033[0m.\n'
         exit(1)
-    exit(0)
-    print 'adsf'
     config = get_config()
     daemonize('/dev/null',config["log_file"],config["log_file"])
     start_server(config["sock_file"])
