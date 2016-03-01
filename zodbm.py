@@ -60,8 +60,43 @@ def start_server(sock='/tmp/zodbm.sock'):
             connection.send(res)
     connection.send('ZODBM Server Has Stoped')
     connection.close()
+    exit(0)
 
-    
+def get_config():
+    import ConfigParser
+    config = ConfigParser.ConfigParser()
+    path = sys.path[0]
+    config.read(path + "/conf/zodbm.conf")
+
+    c_log_file  = config.get("base","log_file")
+    c_log_level = config.get("base","log_level")
+    c_sock_file = config.get("base","sock_file")
+
+    log_file  = c_log_file  if c_log_file  != '' else path + "/log/zodbm.log"
+    log_level = c_log_level if c_log_level != '' else 3
+    sock_file = c_sock_file if c_sock_file != '' else path + "/lib/zodbm.sock"
+
+    configs = {"log_file":log_file,"log_level":log_level,"sock_file":sock_file}
+    return configs
+
+def verify_passwd():
+    import lib.verify as v
+    verify = v.Verify()
+
+    print '\n  The encrypted text is:'
+    print '  '+verify.generate_code()
+    passwd = raw_input('  please input password for zodbm:')
+    return verify.verify_passwd(passwd)
+    #433245946875903
+
 if __name__ == '__main__':
-    daemonize('/dev/null','/root/zabbix-odbm/log','/root/zabbix-odbm/log')
-    start_server()
+    if verify_passwd():
+        print '  verify \033[4mpassed\033[0m,starting zodbm daemon process.\n'
+    else:
+        print '  verify \033[4mfailed\033[0m,please contact developers in ChinaITSoft.\n'
+        exit(1)
+    exit(0)
+    print 'adsf'
+    config = get_config()
+    daemonize('/dev/null',config["log_file"],config["log_file"])
+    start_server(config["sock_file"])

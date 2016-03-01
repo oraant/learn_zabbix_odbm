@@ -3,7 +3,7 @@ import os
 
 if __name__ == '__main__':
     client = socket.socket(socket.AF_UNIX, socket.SOCK_STREAM)
-    client.connect("/tmp/zodbm.sock")
+    client.connect("/453zcv")
 
     instr = raw_input()
     client.send(instr)
