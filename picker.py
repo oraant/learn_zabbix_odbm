@@ -9,7 +9,10 @@ if __name__ == '__main__':
     '''
     #根据参数获取要发送的内容
     try:
-        req = sys.argv[1]
+        if sys.argv[1] == 'stop':
+            req = 'stop'
+        else:
+            req = sys.argv[1] +';'+ sys.argv[2] +';'+ sys.argv[3]
     except IndexError:
         print ''
         print '  Did not found any parameter.Syntax should be:'
