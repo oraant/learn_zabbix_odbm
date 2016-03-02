@@ -32,20 +32,25 @@ def send_msg(req):
     try:
         client.connect(sock_file)
         client.send(req)
-        print client.recv(1024)
+        res = client.recv(1024)
     except socket.error:
-        print 'ZODBM Server is not running.'
+        res = 'ZODBM Server is not running.'
     finally:
         client.close()
+    return res
 
 def start():
-    main()
+    res = send_msg('status')
+    if res == 'ZODBM Server is not running.':
+        main()
+    else:
+        print res
 
 def stop():
-    send_msg('stop')
+    print send_msg('stop')
 
 def status():
-    send_msg('status')
+    print send_msg('status')
 
 def restart():
     stop()
@@ -62,7 +67,7 @@ if __name__ == '__main__':
             operation.get(req)()
         else:
             req = sys.argv[1] +';'+ sys.argv[2] +';'+ sys.argv[3]
-            send_msg(req)
+            print send_msg(req)
     except IndexError:
         print_help()
         exit(1)
