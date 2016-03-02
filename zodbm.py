@@ -42,9 +42,11 @@ def send_msg(req):
 def start():
     res = send_msg('status')
     if res == 'ZODBM Server is not running.':
+        print 'Starting ZODBM Server:'
         main()
     else:
         print res
+        exit(3)
 
 def stop():
     print send_msg('stop')

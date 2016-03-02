@@ -1,0 +1,41 @@
+#!/bin/sh 
+# This is the init script for starting up the (Zabbix - Oracle DataBase Monitor) Daemon.
+#
+# chkconfig: 345 91 10
+# description: Starts and stops the zabbix-odbm daemon.
+# processname: zabbix-odbm
+#
+# Source function library.
+. /etc/rc.d/init.d/functions
+
+# Get config.
+. /etc/sysconfig/network
+
+# Check that networking is up.
+[ "${NETWORKING}" = "no" ] && exit 0
+
+#basepath=/usr/lib/zabbix/externalscripts/zabbix-odbm
+basepath=/root/zabbix-odbm
+startfile=$basepath/zodbm.py
+
+# See how we were called.
+case "$1" in
+        start)
+                python $startfile start
+                ;;
+        stop)
+                python $startfile stop
+                ;;
+        status)
+                python $startfile status
+                ;;
+        restart)
+                python $startfile restart
+                ;;
+        *)
+                echo "Usage: $0 {start|stop|status|restart}"
+                exit 4
+
+RESULT=$?
+esac
+exit $RESULT
