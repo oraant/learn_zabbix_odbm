@@ -15,7 +15,7 @@ class Verify:
     
     def generate_code(self):
         '''将日期-MAC字符串加密'''
-        text = '160301-11:22:33:44:55:66'
+        text = self.__generate_text()
         text = base64.encodestring(text)
         text = base64.encodestring(text)
         text = base64.encodestring(text)
