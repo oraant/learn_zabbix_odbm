@@ -57,6 +57,7 @@ class SocketServer:
         return res
 
     def server_start(self):
+        '''验证密码，后台创建服务，并处理请求'''
         if self.server_status() == 'Server is running':
             return 'Server is already running'
             exit(1)
