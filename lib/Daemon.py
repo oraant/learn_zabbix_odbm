@@ -44,12 +44,7 @@ class Daemon:
         os.dup2(se.fileno(), sys.stderr.fileno())
 
 if __name__ == '__main__':
-    try:
-        logfile = sys.argv[1]
-    except:
-        pass
-    finally:
-        logfile = '/dev/null'
+    logfile = sys.argv[1]
     d = Daemon('/dev/null',logfile,logfile)
     d.daemonize()
     while(True):

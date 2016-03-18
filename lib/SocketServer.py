@@ -4,18 +4,21 @@ import socket
 
 class SocketServer:
 
-    def __init__(links=5,sockfile='/var/lib/zodbm.sock'):
-        self.sockfile = sockfile
+    def __init__(self,sock_file='/var/lib/zodbm.sock',sock_links=5,config_file='/etc/zodbm.conf',log_file='/var/log/zodbm.log'):
+        self.sock_file = sock_file
+        self.sock_links = sock_links
+        self.config_file = config_file
+        self.log_file = log_file
 
-    def __create_server():
+    def __create_server(self):
         '''开启一个Socket Server服务'''
         self.server = socket.socket(socket.AF_UNIX, socket.SOCK_STREAM)
-        if os.path.exists(sock):
-            os.unlink(sock)
-        self.server.bind(sock)
-        self.server.listen(links)
+        if os.path.exists(self.sock_file):
+            os.unlink(self.sock_file)
+        self.server.bind(self.sock_file)
+        self.server.listen(self.sock_links)
 
-    def __handle_msg(msg_handler):
+    def __handle_msg(self,msg_handler):
         '''处理基本的启、停、查请求'''
         while True:
             connection, address = self.server.accept()
@@ -26,7 +29,7 @@ class SocketServer:
                 res = 'Server is stopped'
                 connection.send(res)
                 connection.close()
-                os.unlink(self.sockfile)
+                os.unlink(self.sock_file)
                 exit(0)
             # 处理状态请求
             elif req == 'status':
@@ -37,11 +40,11 @@ class SocketServer:
                 res = msg_handler.handle(req)
                 connection.send(res)
 
-    def __send_msg(req):
+    def __send_msg(self,req):
         '''创建一个Socket Client，并像服务器发送信息'''
         client = socket.socket(socket.AF_UNIX, socket.SOCK_STREAM)
         try:
-            client.connect(sock_file)
+            client.connect(self.sock_file)
             client.send(req)
             res = client.recv(1024)
         except socket.error:
@@ -50,8 +53,8 @@ class SocketServer:
             client.close()
         return res
 
-    def server_start():
-        if server_status == 'Server is running':
+    def server_start(self):
+        if self.server_status() == 'Server is running':
             return 'Server is already running'
             exit(1)
 
@@ -60,23 +63,29 @@ class SocketServer:
         from Daemon import Daemon
 
         verify = Verify()
-        daemon = Daemon()
-        msg_handler = MsgHandler()
+        daemon = Daemon('/dev/null',self.log_file,self.log_file)
+        msg_handler = MsgHandler(self.config_file)
 
         verify.verify_passwd()
-        __create_server()
-        daemon = Daemon()
-        __handle_msg(msg_handler)
+        self.__create_server()
+        daemon.daemonize()
+        self.__handle_msg(msg_handler)
 
-    def server_stop():
+    def server_stop(self):
         '''向服务发送关闭请求'''
         return self.__send_msg('stop')
 
-    def server_status():
+    def server_status(self):
         '''向服务发送状态请求'''
         return self.__send_msg('status')
 
-    def server_restart():
+    def server_restart(self):
         '''关闭再打开服务器'''
-        self.server_stop()
-        return self.server_start()
+        if self.server_status() == 'Server is running':
+            return self.server_stop() +'\n'+ self.server_start()
+        else:
+            return self.server_start()
+
+    def server_send(self,req):
+        '''向服务器发送信息'''
+        return self.__send_msg(req)

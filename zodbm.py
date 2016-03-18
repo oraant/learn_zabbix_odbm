@@ -3,76 +3,61 @@
 import socket
 import os,sys
 import ConfigParser
-from lib.socket_server import *
 
 def print_help():
+    '''打印帮助信息'''
+
     print ''
-    print '  Did not found any parameter.Syntax should be:\n'
+    print '  Syntax should be like this:\n'
     print '    1. python zodbm.py <start|stop|status|restart>'
-    print '    2. python zodbm.py <tnslink> <data_dict> <parameter>'
+    print '    2. python zodbm.py <message>'
     print ''
-    print '  Exemple:\n'
+    print '  Exemples:\n'
     print '    python zodbm.py start'
     print '    python zodbm.py stop'
-    print '    python zodbm.py system/oracle@192.168.10.10:1521/orcl sysstat physical_read'
+    print '    python zodbm.py system/oracle@192.168.10.10:1521/orcl physical_read'
     print ''
 
 def get_config():
-    '''#获取配置文件以及socket文件的配置'''
+    '''#获取基本配置'''
+
+    global path, log_file, config_file
+    global sock_file, sock_links
+
     path = sys.path[0]
-    config = ConfigParser.ConfigParser()
-    config.read(path + "/conf/zodbm.conf")
+    log_file = path+'/log/server.log'
+    config_file = path+'/conf/server.conf'
+    sock_file = path+'/lib/server.sock'
+    sock_links = 5
 
-    c_sock_file = config.get("base","sock_file")
-    global sock_file
-    sock_file = c_sock_file if c_sock_file != '' else path + "/lib/zodbm.sock"    
-
-def send_msg(req):
-    client = socket.socket(socket.AF_UNIX, socket.SOCK_STREAM)
-    try:
-        client.connect(sock_file)
-        client.send(req)
-        res = client.recv(1024)
-    except socket.error:
-        res = 'ZODBM Server is not running.'
-    finally:
-        client.close()
-    return res
-
-def start():
-    res = send_msg('status')
-    if res == 'ZODBM Server is not running.':
-        print 'Starting ZODBM Server:'
-        main()
-    else:
-        print res
-        exit(3)
-
-def stop():
-    print send_msg('stop')
-
-def status():
-    print send_msg('status')
-
-def restart():
-    stop()
-    start()
-
-if __name__ == '__main__':
-
-    get_config()
-    operation = {'start':start,'stop':stop,'status':status,'restart':restart}
+def verify_argv():
+    '''判断有无参数'''
 
     try:
         req = sys.argv[1]
-        if req in ['start','stop','status','restart']:
-            operation.get(req)()
-        else:
-            req = sys.argv[1] +';'+ sys.argv[2] +';'+ sys.argv[3]
-            print send_msg(req)
-    except IndexError:
-        print_help()
-        exit(1)
     except Exception as e:
         print e
-        exit(2)
+        print_help()
+        exit(1)
+
+if __name__ == '__main__':
+    '''主要业务处理'''
+
+    verify_argv()
+    get_config()
+    req = sys.argv[1]
+
+    from lib.SocketServer import SocketServer
+    socket_server = SocketServer(sock_file,sock_links,config_file,log_file)
+
+    if req == 'start':
+        print socket_server.server_start()
+    elif req == 'stop':
+        print socket_server.server_stop()
+    elif req == 'status':
+        print socket_server.server_status()
+    elif req == 'restart':
+        print socket_server.server_restart()
+    else:
+        req = str(sys.argv[1:])
+        print socket_server.server_send(req)
