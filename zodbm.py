@@ -35,15 +35,18 @@ def verify_argv():
 
     try:
         req = sys.argv[1]
+        return True
     except Exception as e:
-        print e
-        print_help()
-        exit(1)
+        return e
 
 if __name__ == '__main__':
     '''主要业务处理'''
 
-    verify_argv()
+    if verify_argv() != True:
+        print verify_argv()
+        print_help()
+        exit(1)
+
     get_config()
     req = sys.argv[1]
 
