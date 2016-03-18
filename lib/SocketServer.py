@@ -26,7 +26,7 @@ class SocketServer:
 
             # 处理关闭请求
             if req == 'stop':
-                res = 'Server is stopped'
+                res = 'Stoping Server'
                 connection.send(res)
                 connection.close()
                 os.unlink(self.sock_file)
@@ -63,10 +63,15 @@ class SocketServer:
         from Daemon import Daemon
 
         verify = Verify()
+        if verify.verify_passwd():
+            print 'Starting Server.'
+        else:
+            print 'Server can\'t Start'
+            exit(2)
+
         daemon = Daemon('/dev/null',self.log_file,self.log_file)
         msg_handler = MsgHandler(self.config_file)
 
-        verify.verify_passwd()
         self.__create_server()
         daemon.daemonize()
         self.__handle_msg(msg_handler)
