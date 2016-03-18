@@ -1,6 +1,7 @@
 # coding:utf-8
 import sys,os
 import socket
+import logging
 
 class SocketServer:
 
@@ -9,6 +10,8 @@ class SocketServer:
         self.sock_links = sock_links
         self.config_file = config_file
         self.log_file = log_file
+
+        logging.basicConfig(level=logging.INFO,format='%(asctime)s %(levelname)s %(message)s',filename=log_file)
 
     def __create_server(self):
         '''开启一个Socket Server服务'''
@@ -65,8 +68,10 @@ class SocketServer:
         verify = Verify()
         if verify.verify_passwd():
             print 'Starting Server.'
+            logging.info('Starting Server.')
         else:
             print 'Server can\'t Start'
+            logging.warning('passwd is wrong,server can\'t start.')
             exit(2)
 
         daemon = Daemon('/dev/null',self.log_file,self.log_file)
@@ -78,6 +83,7 @@ class SocketServer:
 
     def server_stop(self):
         '''向服务发送关闭请求'''
+        logging.info('Stopping Server.')
         return self.__send_msg('stop')
 
     def server_status(self):
@@ -86,10 +92,8 @@ class SocketServer:
 
     def server_restart(self):
         '''关闭再打开服务器'''
-        if self.server_status() == 'Server is running':
-            return self.server_stop() +'\n'+ self.server_start()
-        else:
-            return self.server_start()
+        print self.server_stop()
+        self.server_start()
 
     def server_send(self,req):
         '''向服务器发送信息'''

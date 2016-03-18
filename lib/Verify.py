@@ -45,7 +45,7 @@ class Verify:
         '''判断密码是否正确'''
         print '\n  The encrypted text is:'
         print '  \033[1;31;31m' + self.__generate_code() + '\033[0m'
-        password = raw_input('  Please input password for zodbm:')
+        password = raw_input('  Please input password calculated by the code:')
         if password == self.__generate_passwd().strip('\n'):
             print '  Verify \033[4mpassed\033[0m.\n'
             return True
