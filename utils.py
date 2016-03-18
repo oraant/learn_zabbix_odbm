@@ -40,7 +40,6 @@ def decode(code):
 
     try:
         command = '''echo `echo ''' + text.strip('\n') + '''|tr -d "a-zA-Z:-"`/3.7+123456|bc'''
-        print command
         output = os.popen(command)
         print output.read().strip()
         output.close()
@@ -49,6 +48,7 @@ def decode(code):
         exit(4)
 
 def help():
+    '''打印使用语法'''
     print ''
     print '  Input parameter is wrong.'
     print ''
@@ -62,6 +62,7 @@ def help():
     print ''
 
 if __name__ == '__main__':
+    '''主要业务处理'''
     try:
         option = sys.argv[1]
         target = sys.argv[2]
