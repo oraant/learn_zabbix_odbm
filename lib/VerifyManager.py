@@ -95,6 +95,7 @@ class VerifyManager:
         return True
 
 def a(name):
+    '''模拟增加一堆记录'''
     v.record_succeed(name)
     v.record_failed(name)
     v.record_failed(name)
@@ -109,6 +110,7 @@ def a(name):
     v.record_succeed(name)
 
 def b(name):
+    '''模拟增加一堆记录'''
     v.record_failed(name)
     v.record_succeed(name)
     v.record_failed(name)
