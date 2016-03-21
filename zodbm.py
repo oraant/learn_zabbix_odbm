@@ -2,7 +2,6 @@
 
 import socket
 import os,sys
-import ConfigParser
 
 def print_help():
     '''打印帮助信息'''
