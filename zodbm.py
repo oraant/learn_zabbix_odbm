@@ -54,13 +54,13 @@ if __name__ == '__main__':
     socket_server = SocketServer(sock_file,sock_links,config_file,log_file)
 
     if req == 'start':
-        socket_server.server_start()
+        print socket_server.server_start()
     elif req == 'stop':
         print socket_server.server_stop()
     elif req == 'status':
         print socket_server.server_status()
     elif req == 'restart':
-        socket_server.server_restart()
+        print socket_server.server_restart()
     else:
         req = str(sys.argv[1:])
         print socket_server.server_send(req)
